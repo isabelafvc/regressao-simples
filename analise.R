@@ -1,9 +1,14 @@
 ## ---- REGRESSÃO LINEAR SIMPLES EM R  ---- ##
 
-# Bibliotecas necessárias
+# Pacotes necessários
+
+if(!require(remotes)) install.packages("remotes")
+remotes::install_github("fndemarqui/reglin", force = TRUE)
 
 library('tidyverse')
 library('ggplot2')
+library('reglin')
+library(car)
 
 # Leitura dos dados
 
@@ -47,6 +52,8 @@ summary(mod)
 
 ## ---- verificação das suposições (Análise de resíduos)
 
+signif <- 0.05
+
 #* As suposições do modelo de regressão simples são:
 #* 
 #* Linearidade entre X (experiência) e Y (salário)
@@ -59,12 +66,34 @@ summary(mod)
 
 plot(mod)
 
-# Os pontos parecem se dispor aleatoriamente sobre o 0
+# Normalidade dos erros - shapiro-Wilk test
 
-# Resíduos
+normalidade <- shapiro.test(mod$residuals)
+if (normalidade$p.value < signif){
+  print('Há evidências de que os erros não são normais')
+}else{
+  print('Não há evidências de que os erros são normais')
+}
 
+# Independência dos erros - Durbin-Watson Test
 
+independencia <- durbinWatsonTest(mod)
+if (independencia$p < signif){
+  print('Há evidências de que os erros não são independentes')
+}else{
+  print('Não há evidências de que os erros são independentes')
+}
 
+# Homocedasticidade da variância dos erros - Non constant variance test
+
+homocedasticidade <- ncvTest(mod)
+if (homocedasticidade$p < signif){
+  print('Há evidências de que a variância dos erros é heterocedástica')
+}else{
+  print('Não há evidências de que a variância dos erros é heterocedástica')
+}
+
+  ## ---- Medidas de influência
 
 
 
